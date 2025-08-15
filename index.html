@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BSFREENATION — Send Proposals</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background:#f7f7f7; text-align:center; }
+    h1 { margin-bottom:10px; }
+    .btn { display:block; width:100%; max-width:420px; margin:12px auto; padding:18px; font-size:18px; border-radius:10px; border:0; cursor:pointer; }
+    .tx { background:#1e90ff; color:#fff; }
+    .sc { background:#28a745; color:#fff; }
+    .both { background:#6f42c1; color:#fff; }
+    .status { margin-top:16px; font-size:15px; color:#333; }
+  </style>
+</head>
+<body>
+  <h1>BSFREENATION — Send Package</h1>
+  <p>Tap a button to send the final PDF to the selected recipients.</p>
+
+  <button class="btn tx" onclick="send('tx')">Send to Texas</button>
+  <button class="btn sc" onclick="send('sc')">Send to South Carolina</button>
+  <button class="btn both" onclick="send('both')">Send to Both</button>
+
+  <div class="status" id="status"></div>
+
+  <script>
+    async function send(target) {
+      const status = document.getElementById('status');
+      status.textContent = 'Sending...';
+      try {
+        const resp = await fetch('/send?target=' + encodeURIComponent(target), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-send-token': 'REPLACE_WITH_SEND_SECRET'
+          },
+          body: JSON.stringify({ target })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          status.textContent = 'Sent successfully. Check the send logs if needed.';
+        } else {
+          status.textContent = 'Error: ' + (data.error || 'unknown');
+        }
+      } catch (err) {
+        status.textContent = 'Network error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
